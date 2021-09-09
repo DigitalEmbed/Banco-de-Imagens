@@ -44,6 +44,7 @@ class PictureRepository():
                 picture = Picture.query.get(dict['id'])
                 picture.user_id = dict['user']['id']
                 picture.label = dict['label']
+                picture.mime = dict['mime']
                 picture.updated_at = datetime.now()
                 if 'excluded_at' in dict:
                     picture.excluded_at = dict['excluded_at']
@@ -58,7 +59,6 @@ class PictureRepository():
                 format = str(dict['mime']).split("/")[1]
                 file = open(directory + '/' + dict['label'] + '.' + format, 'wb')
                 file.write(base64.b64decode(str(data)))
-            
             db.session.add(picture)
             db.session.commit()
             return Returns.CREATED
@@ -97,7 +97,10 @@ class PictureRepository():
                 buffer = BytesIO()
                 if (height != 0 and width != 0):
                     file.thumbnail([height, width])
-                file.save(buffer, "JPEG")
+                if (format == "jpg"):
+                    file.save(buffer, format="JPEG")
+                else:
+                    file.save(buffer, format=str.upper(format))
                 return base64.b64encode(buffer.getvalue())
         except:
             return None

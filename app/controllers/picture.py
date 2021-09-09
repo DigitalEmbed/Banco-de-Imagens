@@ -42,6 +42,8 @@ def delete_picture(current_user, label):
 @app.route("/picture", methods=['PUT'])
 @Authorization.token_required
 def update_picture(current_user):
+    if ('id' not in request.get_json()):
+        return MakeResponse.bad_request("Please send picture ID.")
     request.get_json()['user'] = current_user
     if PictureService.update(request.get_json(), request.get_json()['data']) == Returns.CREATED:
         return MakeResponse.ok()
